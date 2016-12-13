@@ -10,6 +10,7 @@ use App\Repositories\PaisRepository;
 use Flash;
 use App\Http\Controllers\AppBaseController;
 use Response;
+use App\Models\Pais;
 
 class PaisController extends AppBaseController
 {
@@ -22,14 +23,12 @@ class PaisController extends AppBaseController
     }
 	/* servicios para moviles */
 	public function listar(){
-          $paises = $this->paisRepository->all();
+		   $lista= Pais::orderBy('descripcion')->pluck('descripcion', 'id');
 			return Response::json([
-				 'data' => $paises
+				  $lista
 			], 200);
      }
 	 /* fin servicios para moviles */
-	
-	
     /**
      * Display a listing of the Pais.
      *

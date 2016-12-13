@@ -10,7 +10,7 @@ use App\Repositories\IdiomaRepository;
 use Flash;
 use App\Http\Controllers\AppBaseController;
 use Response;
-
+use App\Models\Idioma;
 class IdiomaController extends AppBaseController
 {
     /** @var  IdiomaRepository */
@@ -20,7 +20,12 @@ class IdiomaController extends AppBaseController
     {
         $this->idiomaRepository = $idiomaRepo;
     }
-
+	public function listar(){
+          $lista= Idioma::orderBy('descripcion')->pluck('descripcion', 'id');
+			return Response::json([
+				  $lista
+			], 200);
+     }
     /**
      * Display a listing of the Idioma.
      *

@@ -79,7 +79,8 @@ class Empleador extends Model
         'descripcion',
         'direccion',
         'ciudad_id',
-        'url_imagen'
+        'url_imagen',
+		'user_id'
     ];
 
     /**

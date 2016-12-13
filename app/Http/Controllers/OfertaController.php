@@ -20,7 +20,14 @@ class OfertaController extends AppBaseController
     {
         $this->ofertaRepository = $ofertaRepo;
     }
-
+	
+	public function listar(){
+		   $lista = $this->ofertaRepository->all();
+			return Response::json([
+				  $lista
+			], 200);
+     }
+	
     /**
      * Display a listing of the Oferta.
      *

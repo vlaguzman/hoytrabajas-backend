@@ -107,7 +107,8 @@ class Candidato extends Model
         'experiencia',
         'rate',
         'genero_id',
-        'ciudad_id'
+        'ciudad_id',
+		'user_id'
     ];
 
     /**

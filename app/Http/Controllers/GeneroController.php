@@ -10,6 +10,7 @@ use App\Repositories\GeneroRepository;
 use Flash;
 use App\Http\Controllers\AppBaseController;
 use Response;
+use App\Models\Genero;
 
 class GeneroController extends AppBaseController
 {
@@ -20,7 +21,14 @@ class GeneroController extends AppBaseController
     {
         $this->generoRepository = $generoRepo;
     }
-
+	
+	public function listar(){
+          $lista= Genero::orderBy('descripcion')->pluck('descripcion', 'id');
+			return Response::json([
+				$lista
+			], 200);
+     }
+	
     /**
      * Display a listing of the Genero.
      *

@@ -10,6 +10,7 @@ use App\Repositories\DepartamentoRepository;
 use Flash;
 use App\Http\Controllers\AppBaseController;
 use Response;
+use App\Models\Departamento;
 
 class DepartamentoController extends AppBaseController
 {
@@ -20,7 +21,13 @@ class DepartamentoController extends AppBaseController
     {
         $this->departamentoRepository = $departamentoRepo;
     }
-
+	public function listar(){
+         // $lista = $this->departamentoRepository->all();
+		  $lista= Departamento::orderBy('descripcion')->pluck('descripcion', 'id');
+			return Response::json([
+				  $lista
+			], 200);
+     }
     /**
      * Display a listing of the Departamento.
      *

@@ -20,7 +20,14 @@ class CandidatoController extends AppBaseController
     {
         $this->candidatoRepository = $candidatoRepo;
     }
-
+	
+	public function listar(){
+		   $lista = $this->candidatoRepository->all();
+			return Response::json([
+				  $lista
+			], 200);
+     }
+	 
     /**
      * Display a listing of the Candidato.
      *

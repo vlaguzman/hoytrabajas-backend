@@ -10,6 +10,7 @@ use App\Repositories\EstudioRepository;
 use Flash;
 use App\Http\Controllers\AppBaseController;
 use Response;
+use App\Models\Estudio;
 
 class EstudioController extends AppBaseController
 {
@@ -20,7 +21,12 @@ class EstudioController extends AppBaseController
     {
         $this->estudioRepository = $estudioRepo;
     }
-
+	public function listar(){
+          $lista= Estudio::orderBy('descripcion')->pluck('descripcion', 'id');
+			return Response::json([
+				  $lista
+			], 200);
+     }
     /**
      * Display a listing of the Estudio.
      *

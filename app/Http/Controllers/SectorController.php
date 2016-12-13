@@ -10,6 +10,7 @@ use App\Repositories\SectorRepository;
 use Flash;
 use App\Http\Controllers\AppBaseController;
 use Response;
+use App\Models\Sector;
 
 class SectorController extends AppBaseController
 {
@@ -20,7 +21,12 @@ class SectorController extends AppBaseController
     {
         $this->sectorRepository = $sectorRepo;
     }
-
+	public function listar(){
+          $lista= Sector::orderBy('descripcion')->pluck('descripcion', 'id');
+			return Response::json([
+				  $lista
+			], 200);
+     }
     /**
      * Display a listing of the Sector.
      *
