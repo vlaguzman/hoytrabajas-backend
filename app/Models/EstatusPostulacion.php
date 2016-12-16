@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
  * @SWG\Definition(
- *      definition="MembresiaCandidato",
+ *      definition="EstatusPostulacion",
  *      required={""},
  *      @SWG\Property(
  *          property="id",
@@ -16,24 +16,17 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  *          format="int32"
  *      ),
  *      @SWG\Property(
- *          property="pagado",
- *          description="pagado",
- *          type="number",
- *          format="float"
- *      ),
- *      @SWG\Property(
- *          property="candidato_id",
- *          description="candidato_id",
- *          type="integer",
- *          format="int32"
+ *          property="descripcion",
+ *          description="descripcion",
+ *          type="string"
  *      )
  * )
  */
-class MembresiaCandidato extends Model
+class EstatusPostulacion extends Model
 {
     use SoftDeletes;
 
-    public $table = 'membresias_candidatos';
+    public $table = 'estatus_postulaciones';
     
     const CREATED_AT = 'created_at';
     const UPDATED_AT = 'updated_at';
@@ -43,11 +36,7 @@ class MembresiaCandidato extends Model
 
 
     public $fillable = [
-        'pagado',
-        'desde',
-        'hasta',
-        'candidato_id',
-		'membresia_id' 
+        'descripcion'
     ];
 
     /**
@@ -57,8 +46,7 @@ class MembresiaCandidato extends Model
      */
     protected $casts = [
         'id' => 'integer',
-        'candidato_id' => 'integer',
-		'membresia_id'  => 'integer'
+        'descripcion' => 'string'
     ];
 
     /**
@@ -70,5 +58,11 @@ class MembresiaCandidato extends Model
         
     ];
 
-    
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     **/
+    public function postulaciones()
+    {
+        return $this->hasMany(\App\Models\Postulacione::class);
+    }
 }

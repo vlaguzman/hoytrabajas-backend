@@ -129,7 +129,8 @@ class Candidato extends Model
         'experiencia' => 'integer',
         'rate' => 'integer',
         'genero_id' => 'integer',
-        'ciudad_id' => 'integer'
+        'ciudad_id' => 'integer',
+		'user_id' => 'integer'
     ];
 
     /**

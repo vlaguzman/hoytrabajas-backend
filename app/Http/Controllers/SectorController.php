@@ -22,10 +22,8 @@ class SectorController extends AppBaseController
         $this->sectorRepository = $sectorRepo;
     }
 	public function listar(){
-          $lista= Sector::orderBy('descripcion')->pluck('descripcion', 'id');
-			return Response::json([
-				  $lista
-			], 200);
+		$lista= Sector::orderBy('descripcion', 'desc')->get(['id', 'descripcion']);
+		return Response::json($lista);
      }
     /**
      * Display a listing of the Sector.

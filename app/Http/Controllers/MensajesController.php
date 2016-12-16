@@ -2,14 +2,18 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Support\Facades\DB;
 use App\DataTables\MensajesDataTable;
 use App\Http\Requests;
+use Illuminate\Http\Request;
 use App\Http\Requests\CreateMensajesRequest;
 use App\Http\Requests\UpdateMensajesRequest;
 use App\Repositories\MensajesRepository;
 use Flash;
 use App\Http\Controllers\AppBaseController;
 use Response;
+use App\Models\Mensajes;
+
 
 class MensajesController extends AppBaseController
 {
@@ -20,10 +24,68 @@ class MensajesController extends AppBaseController
     {
         $this->mensajesRepository = $mensajesRepo;
     }
+	public function listar(){
+		$de_ ="";
+		$para_ ="";
+	    $postdata = file_get_contents("php://input");
+		if (isset($postdata)) {
+			$requestx = json_decode($postdata);
+			if (isset($requestx->de)) {
+				$de_  = $requestx->de;
+			}
+			if (isset($requestx->para)) {
+				$para_  = $requestx->para;
+			}
+		}
+		/*date_default_timezone_set('America/Bogota');
+	    $fecha_ = date("Y-m-d", time());
+		$hora_=  date("H:i:s", time());
+		$validar=$fecha_.$hora_;*/
+		$lista="";
+		$lista = DB::select( DB::raw("SELECT M.id as _id,M.mensaje as text,M.deuser_id as user_id,M.created_at as date,
+					M.leido as readww,M.updated_at as readDate
+					FROM mensajes M
+		            WHERE M.parauser_id='". $para_  ."' and M.deuser_id='". $de_  ."'  ") );	
+			
+        $RP = '{ "messages" : '. json_encode($lista)  .',"unread":0 }';	
+		return 	$RP;
+     }
+	 public function registrar(Request $request){
+		$de_ ="";
+		$para_ ="";
+		$msg_ ="";
+		$postdata = file_get_contents("php://input");
+		if (isset($postdata)) {
+			$requestx = json_decode($postdata);
+			if (isset($requestx->de)) {
+				$de_ = $requestx->de;
+			}
+			if (isset($requestx->para)) {
+				$para_  = $requestx->para;
+			}
+			if (isset($requestx->msg)) {
+				$msg_  = $requestx->msg;
+			}
+			$obj = Mensajes::create([
+						'deuser_id' => intval($de_),
+						'parauser_id' => intval($para_),
+						'mensaje' => $msg_,
+						'recivido'=> 0,
+						'leido'=> 0,
+			       ]);
+			if($obj){
+				$RP = '{"registro":true }';
+				return $RP;
+			}else{
+				$RP = '{"registro":false }';
+				return $RP;
+			}
+		}	
+	 }	
 
     /**
      * Display a listing of the Mensajes.
-     *
+     * 
      * @param MensajesDataTable $mensajesDataTable
      * @return Response
      */

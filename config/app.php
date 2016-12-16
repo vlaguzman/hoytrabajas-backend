@@ -176,6 +176,7 @@ return [
 		Yajra\Datatables\DatatablesServiceProvider::class,
 		Styde\Html\HtmlServiceProvider::class,
 		Intervention\Image\ImageServiceProvider::class,
+		Barryvdh\Cors\ServiceProvider::class,
         //
 
         /*
@@ -241,6 +242,7 @@ return [
 		'Image' => Intervention\Image\Facades\Image::class,
 		'Alert' => Styde\Html\Facades\Alert::class,
 		'Access' => Styde\Html\Facades\Access::class,
+		
     ],
 
 ];

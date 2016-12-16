@@ -23,10 +23,8 @@ class GeneroController extends AppBaseController
     }
 	
 	public function listar(){
-          $lista= Genero::orderBy('descripcion')->pluck('descripcion', 'id');
-			return Response::json([
-				$lista
-			], 200);
+		$lista= Genero::orderBy('descripcion', 'desc')->get(['id', 'descripcion']);
+		return Response::json($lista);
      }
 	
     /**

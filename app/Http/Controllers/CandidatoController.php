@@ -4,12 +4,14 @@ namespace App\Http\Controllers;
 
 use App\DataTables\CandidatoDataTable;
 use App\Http\Requests;
+use Illuminate\Http\Request;
 use App\Http\Requests\CreateCandidatoRequest;
 use App\Http\Requests\UpdateCandidatoRequest;
 use App\Repositories\CandidatoRepository;
 use Flash;
 use App\Http\Controllers\AppBaseController;
 use Response;
+use App\Models\Candidato;
 
 class CandidatoController extends AppBaseController
 {
@@ -21,12 +23,96 @@ class CandidatoController extends AppBaseController
         $this->candidatoRepository = $candidatoRepo;
     }
 	
-	public function listar(){
-		   $lista = $this->candidatoRepository->all();
-			return Response::json([
-				  $lista
-			], 200);
+	public function listar(){//ofertas activas
+		$nom_ ="%";
+		$expe_="";
+		$genero_="";
+		$ciudad_="";
+		$fnac_ ="";
+		
+		$sector_="";
+		$idioma_="";
+		$crits="";
+		$parametros=array();
+	    $postdata = file_get_contents("php://input");
+		if (isset($postdata)) {
+			$requestx = json_decode($postdata);
+			if (isset($requestx->nom)) {
+				$nom_ = $requestx->nom."%";
+			}
+			if (isset($requestx->ciudad)) {
+				$ciudad_ = $requestx->ciudad;
+				$parametros= array( array("ciudad_id","=", $ciudad_ ) );
+			}
+			if (isset($requestx->genero)) {
+				$genero_ = $requestx->genero;
+				$parametros= array( array("genero_id","=", $genero_ ) );
+			}
+			if (isset($requestx->expe)) {
+				$expe_ = $requestx->expe;
+				$parametros= array( array("experiencia",">=", $expe_ ) );
+			}
+			if (isset($requestx->fnac)) {
+				$fnac_ = $requestx->fnac;
+				$parametros= array( array("fnac",">=", $fnac_ ) );
+			}
+			if (isset($requestx->sector)) {
+				$sector_ = $requestx->sector;
+			}
+			if (isset($requestx->idioma)) {
+				$idioma_ = $requestx->idioma;
+			}
+		}
+		$lista= Candidato::where([ ['nombres', 'like',$nom_  ] ] )
+		       ->where($parametros)
+		       ->orderBy('rate', 'desc')->get();
+		
+		if($lista){
+			return Response::json(
+		       [ 'lista' =>  $lista , 'encontro' =>  true ]
+		    );
+		}else{
+			return Response::json([ 'encontro' => false ]);
+		}
+		
      }
+	 public function getcandidatoa(){ //detalle 
+		$id_ ="0";
+	    $postdata = file_get_contents("php://input");
+		if (isset($postdata)) {
+			$requestx = json_decode($postdata);
+			if (isset($requestx->id)) {
+				$id_ = $requestx->id;
+			}
+		}
+		date_default_timezone_set('America/Bogota');
+	    $fecha_ = date("Y-m-d", time());
+		$hora_=  date("H:i:s", time());
+		$validar=$fecha_.$hora_;	
+		$item= Oferta::where([ ['id', '=',$id_ ],['desde', '<=',$validar ],['hasta', '>=',$validar ] ] )
+		    ->orderBy('created_at', 'desc')->first();
+		return Response::json([ 'post' =>  $item ]);
+     }
+	 public function getcandidatodetalle(){ //detalle 
+		$id_ ="0";
+	    $postdata = file_get_contents("php://input");
+		if (isset($postdata)) {
+			$requestx = json_decode($postdata);
+			if (isset($requestx->id)) {
+				$id_ = $requestx->id;
+			}
+		}	
+		$item= Candidato::where([ ['id', '=',$id_ ]] )->first();
+		if($item){
+			return Response::json( $item );
+		}else{
+			return Response::json( $item );
+		}
+		
+     }
+	 //buscarcandidato ,
+	 
+	 
 	 
     /**
      * Display a listing of the Candidato.

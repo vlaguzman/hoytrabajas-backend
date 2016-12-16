@@ -21,10 +21,8 @@ class IdiomaController extends AppBaseController
         $this->idiomaRepository = $idiomaRepo;
     }
 	public function listar(){
-          $lista= Idioma::orderBy('descripcion')->pluck('descripcion', 'id');
-			return Response::json([
-				  $lista
-			], 200);
+		$lista= Idioma::orderBy('descripcion', 'desc')->get(['id', 'descripcion']);
+		return Response::json($lista);
      }
     /**
      * Display a listing of the Idioma.

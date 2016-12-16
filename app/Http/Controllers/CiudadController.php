@@ -21,10 +21,17 @@ class CiudadController extends AppBaseController
         $this->ciudadRepository = $ciudadRepo;
     }
 	public function listar(){
-		  $lista= Ciudad::orderBy('descripcion')->pluck('descripcion', 'id');
-			return Response::json([
-				  $lista
-			], 200);
+		    $id_="0";
+			$postdata = file_get_contents("php://input");
+			if (isset($postdata)) {
+				$requestx = json_decode($postdata);
+				if (isset($requestx->id)) {
+					$id_ = $requestx->id;
+				}
+			}	
+		  $lista= Ciudad::where([ ['departamento_id', '=',$id_ ] ] )
+		    ->orderBy('descripcion', 'desc')->get(['id', 'descripcion']);
+		return Response::json($lista);
      }
     /**
      * Display a listing of the Ciudad.

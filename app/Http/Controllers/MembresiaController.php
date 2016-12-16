@@ -4,12 +4,15 @@ namespace App\Http\Controllers;
 
 use App\DataTables\MembresiaDataTable;
 use App\Http\Requests;
+use Illuminate\Http\Request;
 use App\Http\Requests\CreateMembresiaRequest;
 use App\Http\Requests\UpdateMembresiaRequest;
 use App\Repositories\MembresiaRepository;
 use Flash;
 use App\Http\Controllers\AppBaseController;
 use Response;
+
+
 
 class MembresiaController extends AppBaseController
 {

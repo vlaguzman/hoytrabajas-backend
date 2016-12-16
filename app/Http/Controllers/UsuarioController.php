@@ -10,13 +10,16 @@ use App\Http\Requests\UpdateUsuarioRequest;
 use App\Repositories\UsuarioRepository;
 use Flash;
 use App\Http\Controllers\AppBaseController;
+use Illuminate\Support\Facades\Auth;
 use Response;
 use App\User;
 use App\Models\Empleador;
 use App\Models\Candidato;
 use App\Models\Usuario;
-use Illuminate\Support\Facades\Auth;
-
+use App\Models\SectorCandidato;
+use App\Models\IdiomasCandidato;
+use App\Models\EstudiosCandidato;
+			
 
 class UsuarioController extends AppBaseController
 {
@@ -29,10 +32,10 @@ class UsuarioController extends AppBaseController
     }
 	
 	public function login(Request $request){
-		if (!is_array($request->all())) {
+		/*if (!is_array($request->all())) {
             return ['error' => 'array requerido'];
         }
-		/*$usu_=$request->usuario;
+		$usu_=$request->usuario;
 		$psw_=$request->clave;*/
 		$usu_="";
 		$psw_="";
@@ -51,22 +54,23 @@ class UsuarioController extends AppBaseController
 			}
 		}
 		$okp=Auth::attempt(['email' => $usu_, 'password' => $psw_]);
-		$usuario=Usuario::where([ ['email', '=', $usu_],['tipo', '=', $tp_]   ] )->first();
+		$usuario=Usuario::where([ ['email', '=', $usu_] ] )->first();
 		if ($okp  && $usuario ){
 		   $RP = '{"login":false}';
 		   $id_=$usuario->id;
+		   $tp_=$usuario->tipo;
 		   if($tp_=="1"){ //para administradores
 			   
 		   }else if($tp_=="2"){//para empleadores
 			   $obj=Empleador::where([ ['user_id', '=', $id_] ] )->first();
-			   $RP = '{"login":true,"usuario_id":"'. $id_ . '","id_obj":"'. $obj->id . '", 
+			   $RP = '{"login":true,"usuario_id":"'. $id_ . '","obj_id":"'. $obj->id . '", 
 				  "nombres":"'. $obj->contacto . '","empresa":"'. $obj->empresa . '","imagen":"'. $obj->url_imagen . '",
 				  "telefono":"'. $obj->telefono . '","correo":"'. $obj->correo . '","descripcion":"'. $obj->descripcion . '",
 				  "direccion":"'. $obj->direccion . '","ciudad_id":"'. $obj->ciudad_id . '",
 				  "rol":"2" }'; 
 		   }else if ($tp_=="3"){ //para usuarios
 		       $obj=Candidato::where([ ['user_id', '=', $id_] ] )->first();
-		       $RP = '{"login":true,"id_usuario":"'. $id_ . '","id_obj":"'. $obj->id . '", 
+		       $RP = '{"login":true,"usuario_id":"'. $id_ . '","obj_id":"'. $obj->id . '","empresa":"N/A", 
 				  "nombres":"'. $obj->nombres . '","apellidos":"'. $obj->apellidos . '","imagen":"'. $obj->url_imagen . '",
 				  "telefono":"'. $obj->telefono . '","correo":"'. $obj->correo . '","descripcion":"'. $obj->descripcion . '",
 				  "direccion":"'. $obj->direccion . '","ciudad_id":"'. $obj->ciudad_id . '","fnac":"'. $obj->fnac . '",
@@ -75,17 +79,12 @@ class UsuarioController extends AppBaseController
 		   } 
            return $RP;
         }else{
-			return Response::json([
-				 'msg' => 'Credenciales invalidas',
-				 'login' => false
-			], 200);
+			$RP = '{"login":false,"msg" : "Credenciales invalidas" }';
+			return $RP ;
 		}
 	 }	
 		
 	public function registrar2(Request $request){
-		if (!is_array($request->all())) {
-            return ['error' => 'array requerido'];
-        }
 		$usu_="";
 		$psw_="";
 		$nombre_ ="";
@@ -119,18 +118,20 @@ class UsuarioController extends AppBaseController
 			if (isset($requestx->dire)) {
 				$direccion_ = $requestx->dire;
 			}
-			if (isset($requestx->ciudad)) {
-				$ciudad_id_ = $requestx->ciudad;
+			if (isset($requestx->ciudad_id)) {
+				$ciudad_id_ = $requestx->ciudad_id;
 			}
 			if (isset($requestx->imagen)) {
 				$url_imagen_ = $requestx->imagen;
 			}
 			$user = User::whereEmail( $usu_ )->first();
+			$url_imagen_ ="img/no-photo.jpg";
 			if(!$user){
 				$obj =  User::create([
 					'name' => $nombre_,
 					'email' => $usu_,
 					'tipo' => 2,
+					'url_imagen' => $url_imagen_,
 					'password' => bcrypt($psw_),
 				 ]);
 				$id_usr=$obj->id;
@@ -146,35 +147,24 @@ class UsuarioController extends AppBaseController
 							'user_id' => intval($id_usr),
 				]);
 				if($obj){
-					return Response::json([
-						 'msg' => 'Empleador '. $empresa_ .', creado exitosamente!',
-						 'registro' => true
-						], 200);
+					$RP = '{"registro":true,"msg" : "Empresa '. $empresa_ .', registrada exitosamente!" }';
+					return $RP;
 				}else{
-					return Response::json([
-						 'msg' => 'No se pudo procesar el registro, intente mas tarde',
-						 'registro' => false
-						], 200);
+					$RP = '{"registro":false,"msg" : "No se pudo procesar el registro, intente mas tarde" }';
+					return $RP;
 				}
 			}else{
-				return Response::json([
-				 'msg' => 'Usuario '. $usu_  .', ya esta registrado, ingrese uno distinto',
-				 'registro' => false
-			    ], 200);
+				$RP = '{"registro":false,"msg" : "Usuario '. $usu_  .' , ya esta registrado, ingrese uno distinto" }';
+				return $RP;
 			}
 		}
-		
-		return Response::json([
-				 'msg' => 'No se ha podido registrar',
-				 'registro' => false
-			], 200);
-		
+		$RP = '{"registro":false,"msg" : "No se ha podido registrar" }';
+		return $RP;
 	}	
 	public function registrar3(Request $request){
-		if (!is_array($request->all())) {
+		/*if (!is_array($request->all())) {
             return ['error' => 'array requerido'];
-        }
-
+        }*/
 		$usu_="";
 		$psw_="";
 		$nombre_ ="";
@@ -182,12 +172,16 @@ class UsuarioController extends AppBaseController
 		$telefono_ ="";
 		$descripcion_ ="";
 		$direccion_ ="";
-		$ciudad_id_ ="";
+		$ciudad_id_ ="1";
 		$genero_ ="";
 		$url_imagen_ ="";
-		$fnac_ = "";
+		$fnac_ = "01-01-2000";
 		$rate_ = "0";
 		$expe_ = "0";
+		$sectores_ ="";
+		$idiomas_ = "";
+		$estudios_ = "";
+		
 		$postdata = file_get_contents("php://input");
 		if (isset($postdata)) {
 			$requestx = json_decode($postdata);
@@ -215,8 +209,8 @@ class UsuarioController extends AppBaseController
 			if (isset($requestx->dire)) {
 				$direccion_ = $requestx->dire;
 			}
-			if (isset($requestx->ciudad)) {
-				$ciudad_id_ = $requestx->ciudad;
+			if (isset($requestx->ciudad_id)) {
+				$ciudad_id_ = $requestx->ciudad_id;
 			}
 			if (isset($requestx->imagen)) {
 				$url_imagen_ = $requestx->imagen;
@@ -230,12 +224,25 @@ class UsuarioController extends AppBaseController
 			if (isset($requestx->genero)) {
 				$genero_ = $requestx->genero;
 			}
+			if (isset($requestx->estudios)) {
+				$estudios_ = $requestx->estudios;
+			}
+			if (isset($requestx->idiomas)) {
+				$idiomas_ = $requestx->idiomas;
+			}
+			if (isset($requestx->sectores)) {
+				$sectores_ = $requestx->sectores;
+			}
+			
 			$user = User::whereEmail( $usu_ )->first();
+			$url_imagen_ ="img/no-photo.jpg";
+			$ciudad_id_ = "1";
 			if(!$user){
 				$obj =  User::create([
 					'name' => $nombre_,
 					'email' => $usu_,
 					'tipo' => 3,
+					'url_imagen' => $url_imagen_,
 					'password' => bcrypt($psw_),
 				 ]);
 				$id_usr=$obj->id;
@@ -255,31 +262,54 @@ class UsuarioController extends AppBaseController
 							'user_id' => intval($id_usr),
 				]);
 				if($obj){
-					return Response::json([
-						 'msg' => 'Usuario '. $nombre_ .', registrado exitosamente!',
-						 'registro' => true
-						], 200);
+					$id_=$obj->id;
+					SectorCandidato::create([
+								'candidato_id' => $id_,
+								'sector_id' => intval($sectores_),
+					]);
+					IdiomasCandidato::create([
+								'candidato_id' => $id_,
+								'idioma_id' => intval($idiomas_),
+					]);
+					EstudiosCandidato::create([
+								'candidato_id' => $id_,
+								'estudio_id' => intval($estudios_),
+					]);
+					$RP = '{"registro":true, "id" : "'. $id_ .'" ,"msg" : "Usuario '. $nombre_ .', registrada exitosamente!" }';
+					return $RP;
 				}else{
-					return Response::json([
-						 'msg' => 'No se pudo procesar el registro, intente mas tarde',
-						 'registro' => false
-						], 200);
+					$RP = '{"registro":false,"msg" : "No se pudo procesar el registro, intente mas tarde" }';
+					return $RP;
 				}
 			}else{
-				return Response::json([
-				 'msg' => 'Usuario '. $usu_  .', ya esta registrado, ingrese uno distinto',
-				 'registro' => false
-			    ], 200);
+				$RP = '{"registro":false,"msg" : "Usuario '. $usu_  .' , ya esta registrado, ingrese uno distinto" }';
+				return $RP;
 			}
 		}
 		
-		return Response::json([
-				 'msg' => 'No se ha podido registrar',
-				 'registro' => false
-			], 200);
-		
+		$RP = '{"registro":false,"msg" : "No se ha podido registrar" }';
+		return $RP;
 	}	
-		
+	public function detallesuario(Request $request){
+		$id_ ="";
+		$postdata = file_get_contents("php://input");
+		if (isset($postdata)) {
+			$requestx = json_decode($postdata);
+			if (isset($requestx->id)) {
+				$id_ = $requestx->id;
+			}
+			$obj= Usuario::where([ ['id', '=',$id_ ] ] )->first();
+			if (!empty($obj)) {
+				$RP = '{"encontrado":true,"id" : "'. $obj->id .'","usuario" : "'. $obj->email .'",
+						"nombre" : "'. $obj->name .'","url_imagen" :  "'. $obj->url_imagen .'",
+						"tipo" :  "'. $obj->tipo .'" }';
+				return $RP;
+			}else{
+				$RP = '{"encontrado":false }';
+				return $RP;
+			}	
+		}	
+	 }		
 	
     /**
      * Display a listing of the Usuario.

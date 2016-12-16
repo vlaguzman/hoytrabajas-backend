@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
  * @SWG\Definition(
- *      definition="Postulacion",
+ *      definition="MembresiasCandidato",
  *      required={""},
  *      @SWG\Property(
  *          property="id",
@@ -16,10 +16,10 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  *          format="int32"
  *      ),
  *      @SWG\Property(
- *          property="oferta_id",
- *          description="oferta_id",
- *          type="integer",
- *          format="int32"
+ *          property="pagado",
+ *          description="pagado",
+ *          type="number",
+ *          format="float"
  *      ),
  *      @SWG\Property(
  *          property="candidato_id",
@@ -28,18 +28,18 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  *          format="int32"
  *      ),
  *      @SWG\Property(
- *          property="estatus_id",
- *          description="estatus_id",
+ *          property="membresia_id",
+ *          description="membresia_id",
  *          type="integer",
  *          format="int32"
  *      )
  * )
  */
-class Postulacion extends Model
+class MembresiasCandidato extends Model
 {
     use SoftDeletes;
 
-    public $table = 'postulaciones';
+    public $table = 'membresias_candidatos';
     
     const CREATED_AT = 'created_at';
     const UPDATED_AT = 'updated_at';
@@ -49,9 +49,11 @@ class Postulacion extends Model
 
 
     public $fillable = [
-        'oferta_id',
+        'pagado',
+        'desde',
+        'hasta',
         'candidato_id',
-        'estatus_id'
+        'membresia_id'
     ];
 
     /**
@@ -61,9 +63,8 @@ class Postulacion extends Model
      */
     protected $casts = [
         'id' => 'integer',
-        'oferta_id' => 'integer',
         'candidato_id' => 'integer',
-        'estatus_id' => 'integer'
+        'membresia_id' => 'integer'
     ];
 
     /**
@@ -75,27 +76,5 @@ class Postulacion extends Model
         
     ];
 
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     **/
-    public function candidato()
-    {
-        return $this->belongsTo(\App\Models\Candidato::class);
-    }
-
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     **/
-    public function estatusPostulacion()
-    {
-        return $this->belongsTo(\App\Models\EstatusPostulacion::class);
-    }
-
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     **/
-    public function oferta()
-    {
-        return $this->belongsTo(\App\Models\Oferta::class);
-    }
+    
 }

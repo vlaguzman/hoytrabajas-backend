@@ -4,12 +4,17 @@ namespace App\Http\Controllers;
 
 use App\DataTables\OfertaDataTable;
 use App\Http\Requests;
+use Illuminate\Http\Request;
+
+
 use App\Http\Requests\CreateOfertaRequest;
 use App\Http\Requests\UpdateOfertaRequest;
 use App\Repositories\OfertaRepository;
 use Flash;
 use App\Http\Controllers\AppBaseController;
 use Response;
+use App\Models\Oferta;
+
 
 class OfertaController extends AppBaseController
 {
@@ -21,13 +26,143 @@ class OfertaController extends AppBaseController
         $this->ofertaRepository = $ofertaRepo;
     }
 	
-	public function listar(){
-		   $lista = $this->ofertaRepository->all();
-			return Response::json([
-				  $lista
-			], 200);
+	public function listara(){//ofertas activas
+		$prop_ ="";
+	    $postdata = file_get_contents("php://input");
+		if (isset($postdata)) {
+			$requestx = json_decode($postdata);
+			if (isset($requestx->propietario)) {
+				$prop_ = $requestx->propietario;
+			}
+		}
+		date_default_timezone_set('America/Bogota');
+	    $fecha_ = date("Y-m-d", time());
+		$hora_=  date("H:i:s", time());
+		$validar=$fecha_.$hora_;
+		$lista="";
+		if($prop_ !=""){
+			$lista= Oferta::where([ ['empleador_id', '=',$prop_ ],['desde', '<=',$validar ],['hasta', '>=',$validar ] ] )
+		      ->orderBy('created_at', 'desc')->get();
+		}else{
+			$lista= Oferta::where([ ['desde', '<=',$validar ],['hasta', '>=',$validar ] ] )
+		      ->orderBy('created_at', 'desc')->get();
+		}
+		return Response::json(
+		    [ 'posts' =>  $lista ]
+		);
      }
-	
+	 public function listarb(){ //ofertas vencidas
+	    $prop_ ="";
+	    $postdata = file_get_contents("php://input");
+		if (isset($postdata)) {
+			$requestx = json_decode($postdata);
+			if (isset($requestx->propietario)) {
+				$prop_ = $requestx->propietario;
+			}
+		}
+		date_default_timezone_set('America/Bogota');
+	    $fecha_ = date("Y-m-d", time())  ;
+		$hora_=  date("H:i:s", time());
+		$validar=$fecha_.$hora_;
+		$lista="";
+		if($prop_ !=""){
+			$lista= Oferta::where([ ['empleador_id', '=',$prop_ ], ['hasta', '<=',$validar ] ] )
+				->orderBy('created_at', 'desc')->get();
+		}else{
+			$lista= Oferta::where([ ['hasta', '<=',$validar ] ] )
+				->orderBy('created_at', 'desc')->get();
+		}		
+		return Response::json([ 'posts' =>  $lista ]);
+     }
+	 public function getofertaa(){ //detalle oferta
+		$id_ ="0";
+	    $postdata = file_get_contents("php://input");
+		if (isset($postdata)) {
+			$requestx = json_decode($postdata);
+			if (isset($requestx->id)) {
+				$id_ = $requestx->id;
+			}
+		}
+		date_default_timezone_set('America/Bogota');
+	    $fecha_ = date("Y-m-d", time());
+		$hora_=  date("H:i:s", time());
+		$validar=$fecha_.$hora_;	
+		$item= Oferta::where([ ['id', '=',$id_ ],['desde', '<=',$validar ],['hasta', '>=',$validar ] ] )
+		    ->orderBy('created_at', 'desc')->first();
+		return Response::json([ 'post' =>  $item ]);
+     }
+	 
+	 public function registrar(Request $request){
+		$emp_ ="";
+		$nom_ ="";
+		$des_ ="";
+		$apag_  ="0";
+		$descripcion_ ="";
+		$direccion_ ="";
+		$ciudad_id_ ="1";
+		$sector_ ="1";
+		$url_imagen_ ="";
+		$lat_="0";
+		$lng_="0";
+		$postdata = file_get_contents("php://input");
+		if (isset($postdata)) {
+			$requestx = json_decode($postdata);
+			if (isset($requestx->empleador)) {
+				$emp_ = $requestx->empleador;
+			}
+			if (isset($requestx->nom)) {
+				$nom_ = $requestx->nom;
+			}
+			if (isset($requestx->des)) {
+				$des_ = $requestx->des;
+			}
+			if (isset($requestx->apagar)) {
+				$apag_ = $requestx->apagar;
+			}
+			if (isset($requestx->ciudad_id)) {
+				$ciudad_id_  = $requestx->ciudad_id;
+			}
+			if (isset($requestx->sector)) {
+				$sector_ = $requestx->sector;
+			}
+			if (isset($requestx->dire)) {
+				$direccion_ = $requestx->dire;
+			}
+			if (isset($requestx->imagen)) {
+				$url_imagen_ = $requestx->imagen;
+			}
+			date_default_timezone_set('America/Bogota');
+			$hora_=  date("H:i:s", time());
+			$desde_ = date("Y-m-d", time())." ".$hora_;
+			$fecha = date('Y-m-j')." ".$hora_ ;
+			$nuevafecha = strtotime ( '+1 month' , strtotime ( $fecha ) ) ;
+			$hasta_ = date ( 'Y-m-j' , $nuevafecha )." ".$hora_;
+			
+			$obj = Oferta::create([
+						'desde' => date("Y-m-d H:i:s", strtotime( $desde_ )),
+						'hasta' => date("Y-m-d H:i:s", strtotime( $hasta_ )),
+						'nombre' => $nom_,
+						'descripcion' => $des_ ,
+						'paga' => $apag_,
+						'direccion' => $direccion_,
+						'lat' => $lat_,
+						'lng' => $lng_,
+						'url_imagen' => $url_imagen_,
+						'sector_id' => intval($sector_),
+						'ciudad_id' => intval($ciudad_id_),
+						'empleador_id' => intval($emp_),
+			    ]);
+			if($obj){
+				$RP = '{"registro":true,"msg" : "Oferta registrada exitosamente!" }';
+				return $RP;
+			}else{
+				$RP = '{"registro":false,"msg" : "No se pudo procesar el registro, intente mas tarde" }';
+				return $RP;
+			}
+		}	
+	 }	
+		
+		
     /**
      * Display a listing of the Oferta.
      *

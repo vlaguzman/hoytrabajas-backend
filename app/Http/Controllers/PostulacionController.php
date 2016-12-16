@@ -4,12 +4,16 @@ namespace App\Http\Controllers;
 
 use App\DataTables\PostulacionDataTable;
 use App\Http\Requests;
+use Illuminate\Http\Request;
 use App\Http\Requests\CreatePostulacionRequest;
 use App\Http\Requests\UpdatePostulacionRequest;
 use App\Repositories\PostulacionRepository;
 use Flash;
 use App\Http\Controllers\AppBaseController;
 use Response;
+use App\Models\Postulacion;
+use App\Models\Oferta;
+use Illuminate\Support\Facades\DB;
 
 class PostulacionController extends AppBaseController
 {
@@ -20,7 +24,223 @@ class PostulacionController extends AppBaseController
     {
         $this->postulacionRepository = $postulacionRepo;
     }
-
+	
+	public function listar(){
+		$prop_ ="";
+		$est_  ="";
+	    $postdata = file_get_contents("php://input");
+		if (isset($postdata)) {
+			$requestx = json_decode($postdata);
+			if (isset($requestx->propietario)) {
+				$prop_ = $requestx->propietario;
+			}
+			if (isset($requestx->estatus)) {
+				$est_ = $requestx->estatus;
+			}
+		}
+		date_default_timezone_set('America/Bogota');
+	    $fecha_ = date("Y-m-d", time());
+		$hora_=  date("H:i:s", time());
+		$validar=$fecha_.$hora_;
+		$lista="";
+		$lista = DB::select( DB::raw("SELECT O.* FROM ofertas O,postulaciones P 
+		        WHERE P.oferta_id=O.id and P.estatus_id='". $est_ ."' and P.candidato_id='". $prop_  ."'  ") );	
+		return Response::json(
+		    [ 'posts' =>  $lista ]
+		);
+     }
+	 
+	 public function empleadores(){
+		$prop_ ="1";
+	    $postdata = file_get_contents("php://input");
+		if (isset($postdata)) {
+			$requestx = json_decode($postdata);
+			if (isset($requestx->id)) {
+				$prop_ = $requestx->id;
+			}
+		}
+		date_default_timezone_set('America/Bogota');
+	    $fecha_ = date("Y-m-d", time());
+		$hora_=  date("H:i:s", time());
+		$validar=$fecha_.$hora_;
+		$lista="";
+		$lista = DB::select( DB::raw("SELECT DISTINCT U.id,E.contacto as name,E.empresa,E.created_at as ago,P.estatus_id,U.url_imagen as face 
+		        FROM ofertas O,postulaciones P,empleadores E,users U 
+		        WHERE P.candidato_id='". $prop_  ."' and P.estatus_id in ('1','2') and P.oferta_id=O.id 
+				   and O.empleador_id=E.id and E.user_id=U.id ") );
+		return Response::json(
+		     $lista 
+		);
+     }	
+	 public function usuarios(){
+		$prop_ ="1";
+	    $postdata = file_get_contents("php://input");
+		if (isset($postdata)) {
+			$requestx = json_decode($postdata);
+			if (isset($requestx->id)) {
+				$prop_ = $requestx->id;
+			}
+		}
+		date_default_timezone_set('America/Bogota');
+	    $fecha_ = date("Y-m-d", time());
+		$hora_=  date("H:i:s", time());
+		$validar=$fecha_.$hora_;
+		$lista="";
+		$lista = DB::select( DB::raw("SELECT DISTINCT U.id,E.nombres as name,E.apellidos as empresa,E.created_at as ago,U.url_imagen as face 
+				FROM ofertas O,postulaciones P,candidatos E,users U 
+		        WHERE P.estatus_id in ('1','2') and P.oferta_id=O.id and O.empleador_id='". $prop_  ."'
+				   and P.candidato_id=E.id and E.user_id=U.id ") );
+		return Response::json(
+		     $lista 
+		);
+     }	
+	 
+	public function upendientes(){
+		$prop_ ="";
+	    $postdata = file_get_contents("php://input");
+		if (isset($postdata)){
+			$requestx = json_decode($postdata);
+			if (isset($requestx->id)) {
+				$prop_ = $requestx->id;
+			}
+		}
+		date_default_timezone_set('America/Bogota');
+	    $fecha_ = date("Y-m-d", time());
+		$hora_=  date("H:i:s", time());
+		$validar=$fecha_.$hora_;
+		$lista="";
+		$lista = DB::select( DB::raw("SELECT DISTINCT P.id as pid,E.id,E.nombres,E.apellidos,
+		        E.created_at as ago,U.url_imagen,E.telefono,E.correo,E.descripcion,
+				E.experiencia,E.rate
+				FROM ofertas O,postulaciones P,candidatos E,users U 
+		        WHERE P.estatus_id ='1' and P.oferta_id=O.id and O.empleador_id='". $prop_  ."'
+				   and P.candidato_id=E.id and E.user_id=U.id ") );
+		return Response::json(
+		     $lista 
+		);
+     }	
+	 public function uaceptadas(){
+		$prop_ ="";
+	    $postdata = file_get_contents("php://input");
+		if (isset($postdata)){
+			$requestx = json_decode($postdata);
+			if (isset($requestx->id)) {
+				$prop_ = $requestx->id;
+			}
+		}
+		date_default_timezone_set('America/Bogota');
+	    $fecha_ = date("Y-m-d", time());
+		$hora_=  date("H:i:s", time());
+		$validar=$fecha_.$hora_;
+		$lista="";
+		$lista = DB::select( DB::raw("SELECT DISTINCT E.id,E.nombres ,E.apellidos,
+		        E.created_at as ago,U.url_imagen,E.telefono,E.correo,E.descripcion,E.experiencia,E.rate
+		        FROM ofertas O,postulaciones P,candidatos E,users U 
+		        WHERE P.estatus_id ='2' and P.oferta_id=O.id and O.empleador_id='". $prop_  ."'
+				   and P.candidato_id=E.id and E.user_id=U.id ") );
+		return Response::json(
+		     $lista 
+		);
+     }		
+     public function urechazadas(){
+		$prop_ ="";
+	    $postdata = file_get_contents("php://input");
+		if (isset($postdata)){
+			$requestx = json_decode($postdata);
+			if (isset($requestx->id)) {
+				$prop_ = $requestx->id;
+			}
+		}
+		date_default_timezone_set('America/Bogota');
+	    $fecha_ = date("Y-m-d", time());
+		$hora_=  date("H:i:s", time());
+		$validar=$fecha_.$hora_;
+		$lista="";
+		$lista = DB::select( DB::raw("SELECT DISTINCT E.id,E.nombres,E.apellidos,
+		        E.created_at as ago,U.url_imagen,E.telefono,E.correo,E.descripcion,E.experiencia,E.rate
+		        FROM ofertas O,postulaciones P,candidatos E,users U 
+		        WHERE P.estatus_id ='3' and P.oferta_id=O.id and O.empleador_id='". $prop_  ."'
+				   and P.candidato_id=E.id and E.user_id=U.id ") );
+		return Response::json(
+		     $lista 
+		);
+     }			
+			
+			
+	public function registrar(Request $request){
+		$id_ ="";
+		$emp_ ="";
+		$postdata = file_get_contents("php://input");
+		if (isset($postdata)) {
+			$requestx = json_decode($postdata);
+			if (isset($requestx->id)) {
+				$id_ = $requestx->id;
+			}
+			if (isset($requestx->postulante)) {
+				$emp_  = $requestx->postulante;
+			}
+			$postulacion=Postulacion::where([ ['oferta_id', '=', $id_],['candidato_id', '=', $emp_]   ] )->first();
+		    if (!empty($postulacion)) {
+				$RP = '{"registro":false,"msg" : "Ya tienes una postulacion pendiente a esta oferta" }';
+				return $RP;
+			}	
+			$obj = Postulacion::create([
+						'estatus_id' => 1,
+						'oferta_id' => intval($id_),
+						'candidato_id' => intval($emp_),
+			       ]);
+			if(!empty($obj)  ){
+				$RP = '{"registro":true,"msg" : "Postulado exitosamente!" }';
+				return $RP;
+			}else{
+				$RP = '{"registro":false,"msg" : "No se pudo procesar la postulacion, intente mas tarde" }';
+				return $RP;
+			}
+		}	
+	 }	
+	public function aprobar(Request $request){
+		$id_ ="";
+		$emp_ ="";
+		$postdata = file_get_contents("php://input");
+		if (isset($postdata)) {
+			$requestx = json_decode($postdata);
+			if (isset($requestx->id)) {
+				$id_ = $requestx->id;
+			}
+			$postulacion=Postulacion::find($id_);
+		    if (!empty($postulacion)) {
+				$postulacion->estatus_id=2;
+				if($postulacion->save()){
+				    $RP = '{"registro":true,"msg" : "Empleado Aceptado!" }';
+				   return $RP;
+				}
+			}
+			$RP = '{"registro":false,"msg" : "No se pudo procesar, intente mas tarde" }';
+			return $RP;
+		}	
+	}	
+	public function rechazar(Request $request){
+		$id_ ="";
+		$emp_ ="";
+		$postdata = file_get_contents("php://input");
+		if (isset($postdata)) {
+			$requestx = json_decode($postdata);
+			if (isset($requestx->id)) {
+				$id_ = $requestx->id;
+			}
+			$postulacion=Postulacion::find($id_);
+		    if (!empty($postulacion)) {
+				$postulacion->estatus_id=3;
+				if($postulacion->save()){
+				    $RP = '{"registro":true,"msg" : "Empleado rechazado!" }';
+				   return $RP;
+				}
+			}
+			$RP = '{"registro":false,"msg" : "No se pudo procesar, intente mas tarde" }';
+			return $RP;
+		}	
+	 }
+	 
     /**
      * Display a listing of the Postulacion.
      *

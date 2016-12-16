@@ -53,6 +53,16 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  *          format="int32"
  *      ),
  *      @SWG\Property(
+ *          property="lat",
+ *          description="lat",
+ *          type="string"
+ *      ),
+ *      @SWG\Property(
+ *          property="lng",
+ *          description="lng",
+ *          type="string"
+ *      ),
+ *      @SWG\Property(
  *          property="empleador_id",
  *          description="empleador_id",
  *          type="integer",
@@ -79,8 +89,12 @@ class Oferta extends Model
         'url_imagen',
         'direccion',
         'paga',
+        'desde',
+        'hasta',
         'sector_id',
         'ciudad_id',
+        'lat',
+        'lng',
         'empleador_id'
     ];
 
@@ -98,6 +112,8 @@ class Oferta extends Model
         'paga' => 'string',
         'sector_id' => 'integer',
         'ciudad_id' => 'integer',
+        'lat' => 'string',
+        'lng' => 'string',
         'empleador_id' => 'integer'
     ];
 
@@ -110,5 +126,11 @@ class Oferta extends Model
         
     ];
 
-    
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     **/
+    public function postulaciones()
+    {
+        return $this->hasMany(\App\Models\Postulacion::class);
+    }
 }

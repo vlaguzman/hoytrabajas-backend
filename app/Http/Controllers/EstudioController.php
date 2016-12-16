@@ -22,10 +22,8 @@ class EstudioController extends AppBaseController
         $this->estudioRepository = $estudioRepo;
     }
 	public function listar(){
-          $lista= Estudio::orderBy('descripcion')->pluck('descripcion', 'id');
-			return Response::json([
-				  $lista
-			], 200);
+		  $lista= Estudio::orderBy('descripcion', 'desc')->get(['id', 'descripcion']);
+		  return Response::json($lista);
      }
     /**
      * Display a listing of the Estudio.

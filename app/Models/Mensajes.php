@@ -51,9 +51,6 @@ class Mensajes extends Model
         'deuser_id',
         'parauser_id',
         'mensaje',
-        'fenviado',
-        'frecivido',
-        'fleido',
         'recivido',
         'leido'
     ];

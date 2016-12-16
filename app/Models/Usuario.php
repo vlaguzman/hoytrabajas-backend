@@ -54,6 +54,7 @@ class Usuario extends Model
         'name',
         'email',
 		'tipo',
+		'url_imagen',
         'password',
         'remember_token'
     ];
@@ -68,6 +69,7 @@ class Usuario extends Model
         'name' => 'string',
         'email' => 'string',
 		'tipo' => 'integer',
+		'url_imagen'=> 'string',
         'password' => 'string',
         'remember_token' => 'string'
     ];
