@@ -29,7 +29,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  *      )
  * )
  */
-class EstudiosCandidato extends Model
+class EstudioCandidato extends Model
 {
     use SoftDeletes;
 

@@ -34,6 +34,17 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  *          property="remember_token",
  *          description="remember_token",
  *          type="string"
+ *      ),
+ *      @SWG\Property(
+ *          property="perfil_id",
+ *          description="perfil_id",
+ *          type="integer",
+ *          format="int32"
+ *      ),
+ *      @SWG\Property(
+ *          property="url_imagen",
+ *          description="url_imagen",
+ *          type="string"
  *      )
  * )
  */
@@ -53,10 +64,11 @@ class Usuario extends Model
     public $fillable = [
         'name',
         'email',
-		'tipo',
-		'url_imagen',
         'password',
-        'remember_token'
+        'remember_token',
+        'perfil_id',
+        'activo',
+        'url_imagen'
     ];
 
     /**
@@ -68,10 +80,10 @@ class Usuario extends Model
         'id' => 'integer',
         'name' => 'string',
         'email' => 'string',
-		'tipo' => 'integer',
-		'url_imagen'=> 'string',
         'password' => 'string',
-        'remember_token' => 'string'
+        'remember_token' => 'string',
+        'perfil_id' => 'integer',
+        'url_imagen' => 'string'
     ];
 
     /**
@@ -83,5 +95,60 @@ class Usuario extends Model
         
     ];
 
-    
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     **/
+    public function perfil()
+    {
+        return $this->belongsTo(\App\Models\Perfil::class);
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     **/
+    public function administradores()
+    {
+        return $this->hasMany(\App\Models\Administrador::class);
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     **/
+    public function candidatos()
+    {
+        return $this->hasMany(\App\Models\Candidato::class);
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     **/
+    public function chats()
+    {
+        return $this->hasMany(\App\Models\Chat::class);
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     **/
+    public function configuraciones()
+    {
+        return $this->hasMany(\App\Models\Configuracion::class);
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     **/
+    public function empleadores()
+    {
+        return $this->hasMany(\App\Models\Empleador::class);
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     **/
+    public function mensajes()
+    {
+        return $this->hasMany(\App\Models\Mensaje::class);
+    }
+
 }

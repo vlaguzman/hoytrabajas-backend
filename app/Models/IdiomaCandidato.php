@@ -29,7 +29,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  *      )
  * )
  */
-class IdiomasCandidato extends Model
+class IdiomaCandidato extends Model
 {
     use SoftDeletes;
 

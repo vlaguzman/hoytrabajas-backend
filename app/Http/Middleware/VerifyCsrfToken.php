@@ -13,10 +13,12 @@ class VerifyCsrfToken extends BaseVerifier
      */
     protected $except = [
         'paises*', 'departamentos*', 'ciudades*','generos*', 'estudios*', 'idiomas*', 'sectores*',
-		'ofertasactivas*','ofertasvencidas*','loginm*','registraru2*', 'registraru3*','regoferta*',
-		'regpostulacion*','regpostulaciona*','regpostulacionr*','postulaciones*','*regmembresia',
+		'ofertasactivas*','ofertasvencidas*','loginm*','registraru2*','registraru2rs*','registraru3*','registraru3rs*',
+		'regoferta*','regpostulacion*','regpostulaciona*','regpostulacionr*','postulaciones*','*regmembresia',
 		'getdetoferta*','buscarcandidato*','getcandidatoa*','verificarmembresia*','postulacionempleadores*',
 		'getcandidatodetalle*','getdetusuario*','historicomensajes*','regmensaje*','postulacionusuarios*',
-		'postulacionpendientes*','postulacionaceptadas*','postulacionrechazadas*'
+		'postulacionpendientes*','postulacionaceptadas*','postulacionrechazadas*','loginrs*','registrarurs*',
+		'getempresadetalle*','verificarpostulacion*'
+		
     ];
 }

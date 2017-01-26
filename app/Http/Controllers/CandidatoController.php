@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\DataTables\CandidatoDataTable;
+use Illuminate\Support\Facades\DB;
 use App\Http\Requests;
 use Illuminate\Http\Request;
 use App\Http\Requests\CreateCandidatoRequest;
@@ -23,7 +24,7 @@ class CandidatoController extends AppBaseController
         $this->candidatoRepository = $candidatoRepo;
     }
 	
-	public function listar(){//ofertas activas
+	public function listar(){
 		$nom_ ="%";
 		$expe_="";
 		$genero_="";
@@ -89,9 +90,8 @@ class CandidatoController extends AppBaseController
 	    $fecha_ = date("Y-m-d", time());
 		$hora_=  date("H:i:s", time());
 		$validar=$fecha_.$hora_;	
-		$item= Oferta::where([ ['id', '=',$id_ ],['desde', '<=',$validar ],['hasta', '>=',$validar ] ] )
-		    ->orderBy('created_at', 'desc')->first();
-		return Response::json([ 'post' =>  $item ]);
+		$item= Candidato::where([ ['id', '=',$id_ ] ] )->first();
+		return Response::json(  $item );
      }
 	 public function getcandidatodetalle(){ //detalle 
 		$id_ ="0";
@@ -102,17 +102,18 @@ class CandidatoController extends AppBaseController
 				$id_ = $requestx->id;
 			}
 		}	
-		$item= Candidato::where([ ['id', '=',$id_ ]] )->first();
-		if($item){
-			return Response::json( $item );
-		}else{
-			return Response::json( $item );
-		}
+		//$item= Candidato::where([ ['id', '=',$id_ ]] )->first();
 		
+		$item = DB::select( DB::raw("SELECT E.id,E.nombres as nombre,E.apellidos as apellido,E.nombres,E.apellidos,  
+		          E.fnac,E.genero_id,U.url_imagen,E.telefono,E.correo,E.descripcion,E.descripcion as des,E.experiencia,E.rate as expe,U.id as userid,
+				  G.descripcion as des_genero
+                  FROM candidatos E,users U,generos G
+                  WHERE E.id='". $id_ ."' and E.user_id=U.id and E.genero_id=G.id ") );
+		
+		return Response::json( $item );
      }
-	 //buscarcandidato ,
-	 
-	 
+
+
 	 
     /**
      * Display a listing of the Candidato.

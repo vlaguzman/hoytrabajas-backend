@@ -75,7 +75,7 @@ class OfertaController extends AppBaseController
 		return Response::json([ 'posts' =>  $lista ]);
      }
 	 public function getofertaa(){ //detalle oferta
-		$id_ ="0";
+		$id_ ="23";
 	    $postdata = file_get_contents("php://input");
 		if (isset($postdata)) {
 			$requestx = json_decode($postdata);
@@ -87,8 +87,8 @@ class OfertaController extends AppBaseController
 	    $fecha_ = date("Y-m-d", time());
 		$hora_=  date("H:i:s", time());
 		$validar=$fecha_.$hora_;	
-		$item= Oferta::where([ ['id', '=',$id_ ],['desde', '<=',$validar ],['hasta', '>=',$validar ] ] )
-		    ->orderBy('created_at', 'desc')->first();
+		$item= Oferta::where([ ['id', '=',$id_ ] ] )->first();
+		
 		return Response::json([ 'post' =>  $item ]);
      }
 	 

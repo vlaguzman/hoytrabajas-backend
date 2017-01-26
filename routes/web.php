@@ -43,11 +43,18 @@ Route::get('/home', 'HomeController@index');
 	Route::any('getdetoferta', 'OfertaController@getofertaa');
 	Route::any('getdetcandidato', 'CandidatoController@getcandidatoa');
 	Route::any('verificarmembresia', 'MembresiaCandidatoController@verificar');
+	Route::any('verificarpostulacion', 'PostulacionController@verificar');
 	Route::any('getcandidatodetalle', 'CandidatoController@getcandidatodetalle');
+	Route::any('getempresa', 'EmpleadorController@getempleador');
+	Route::any('getempresadetalle', 'EmpleadorController@getdetalle');
 	/* fin gets*/
 	Route::any('loginm', 'UsuarioController@login');
+	Route::any('loginrs', 'UsuarioController@login_byemail');
+	Route::any('registrarurs', 'UsuarioController@registrarrs');
 	Route::any('registraru2', 'UsuarioController@registrar2');
+	Route::any('registraru2rs', 'UsuarioController@registrar2rs');
 	Route::any('registraru3', 'UsuarioController@registrar3');
+	Route::any('registraru3rs', 'UsuarioController@registrar3rs');
 	Route::any('regoferta', 'OfertaController@registrar');
 	Route::any('regpostulacion', 'PostulacionController@registrar');
 	Route::any('regpostulaciona', 'PostulacionController@aprobar');

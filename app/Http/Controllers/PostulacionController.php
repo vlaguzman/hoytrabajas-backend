@@ -14,6 +14,7 @@ use Response;
 use App\Models\Postulacion;
 use App\Models\Oferta;
 use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
 
 class PostulacionController extends AppBaseController
 {
@@ -97,11 +98,15 @@ class PostulacionController extends AppBaseController
 	 
 	public function upendientes(){
 		$prop_ ="";
+		$oferta_ ="24";
 	    $postdata = file_get_contents("php://input");
 		if (isset($postdata)){
 			$requestx = json_decode($postdata);
 			if (isset($requestx->id)) {
 				$prop_ = $requestx->id;
+			}
+			if (isset($requestx->oferta)) {
+				$oferta_ = $requestx->oferta;
 			}
 		}
 		date_default_timezone_set('America/Bogota');
@@ -110,22 +115,24 @@ class PostulacionController extends AppBaseController
 		$validar=$fecha_.$hora_;
 		$lista="";
 		$lista = DB::select( DB::raw("SELECT DISTINCT P.id as pid,E.id,E.nombres,E.apellidos,
-		        E.created_at as ago,U.url_imagen,E.telefono,E.correo,E.descripcion,
-				E.experiencia,E.rate
+		        E.created_at as ago,U.id as userid,U.url_imagen,E.telefono,E.correo,E.descripcion,E.experiencia,E.rate
 				FROM ofertas O,postulaciones P,candidatos E,users U 
-		        WHERE P.estatus_id ='1' and P.oferta_id=O.id and O.empleador_id='". $prop_  ."'
-				   and P.candidato_id=E.id and E.user_id=U.id ") );
+		        WHERE O.id='". $oferta_ ."' and P.estatus_id ='1' and P.oferta_id=O.id AND P.candidato_id=E.id and E.user_id=U.id ") );
 		return Response::json(
 		     $lista 
 		);
      }	
 	 public function uaceptadas(){
 		$prop_ ="";
+		$oferta_ ="";
 	    $postdata = file_get_contents("php://input");
 		if (isset($postdata)){
 			$requestx = json_decode($postdata);
 			if (isset($requestx->id)) {
 				$prop_ = $requestx->id;
+			}
+			if (isset($requestx->oferta)) {
+				$oferta_ = $requestx->oferta;
 			}
 		}
 		date_default_timezone_set('America/Bogota');
@@ -134,21 +141,25 @@ class PostulacionController extends AppBaseController
 		$validar=$fecha_.$hora_;
 		$lista="";
 		$lista = DB::select( DB::raw("SELECT DISTINCT E.id,E.nombres ,E.apellidos,
-		        E.created_at as ago,U.url_imagen,E.telefono,E.correo,E.descripcion,E.experiencia,E.rate
+		        E.created_at as ago,U.id as userid,U.url_imagen,E.telefono,E.correo,E.descripcion,E.experiencia,E.rate
 		        FROM ofertas O,postulaciones P,candidatos E,users U 
-		        WHERE P.estatus_id ='2' and P.oferta_id=O.id and O.empleador_id='". $prop_  ."'
-				   and P.candidato_id=E.id and E.user_id=U.id ") );
+		        WHERE O.id='". $oferta_ ."'  and P.estatus_id ='2' and P.oferta_id=O.id 
+				and P.candidato_id=E.id and E.user_id=U.id ") );
 		return Response::json(
 		     $lista 
 		);
      }		
      public function urechazadas(){
 		$prop_ ="";
+		$oferta_ ="";
 	    $postdata = file_get_contents("php://input");
 		if (isset($postdata)){
 			$requestx = json_decode($postdata);
 			if (isset($requestx->id)) {
 				$prop_ = $requestx->id;
+			}
+			if (isset($requestx->oferta)) {
+				$oferta_ = $requestx->oferta;
 			}
 		}
 		date_default_timezone_set('America/Bogota');
@@ -157,16 +168,41 @@ class PostulacionController extends AppBaseController
 		$validar=$fecha_.$hora_;
 		$lista="";
 		$lista = DB::select( DB::raw("SELECT DISTINCT E.id,E.nombres,E.apellidos,
-		        E.created_at as ago,U.url_imagen,E.telefono,E.correo,E.descripcion,E.experiencia,E.rate
+		        E.created_at as ago,U.id as userid,U.url_imagen,E.telefono,E.correo,E.descripcion,E.experiencia,E.rate
 		        FROM ofertas O,postulaciones P,candidatos E,users U 
-		        WHERE P.estatus_id ='3' and P.oferta_id=O.id and O.empleador_id='". $prop_  ."'
-				   and P.candidato_id=E.id and E.user_id=U.id ") );
+		        WHERE O.id='". $oferta_ ."'  and P.estatus_id ='3' and P.oferta_id=O.id and P.candidato_id=E.id and E.user_id=U.id ") );
 		return Response::json(
 		     $lista 
 		);
      }			
 			
-			
+	public function verificar(Request $request){
+		$id_oferta ="";
+		$id_empleado ="";
+		$postdata = file_get_contents("php://input");
+		if (isset($postdata)) {
+			$requestx = json_decode($postdata);
+			if (isset($requestx->oferta)) {
+				$id_oferta = $requestx->oferta;
+			}
+			if (isset($requestx->empleado)) {
+				$id_empleado = $requestx->empleado;
+			}
+			$postulacion=Postulacion::where([ ['oferta_id', '=', $id_oferta],['candidato_id', '=', $id_empleado] ] )->first();
+		    if (empty($postulacion)) {
+				$RP = '{"postulado":false }';
+				return $RP;
+			}else{
+				$carbon = new Carbon($postulacion->created_at, 'America/Bogota');
+                $nv_fecha= $carbon->addDays(1);
+				$fa = Carbon::now('America/Bogota');
+                $prog = $fa->diffInHours($nv_fecha);
+				$RP = '{"postulado":true, "estatus": "'. $postulacion->estatus_id .'",
+				"desde": "'. $fa .'","vence": "'. $nv_fecha .'","horas": "'. $prog .'"  }';
+				return $RP;
+			}
+		}	
+	 }		
 	public function registrar(Request $request){
 		$id_ ="";
 		$emp_ ="";
@@ -180,7 +216,7 @@ class PostulacionController extends AppBaseController
 				$emp_  = $requestx->postulante;
 			}
 			$postulacion=Postulacion::where([ ['oferta_id', '=', $id_],['candidato_id', '=', $emp_]   ] )->first();
-		    if (!empty($postulacion)) {
+		    if ($postulacion) {
 				$RP = '{"registro":false,"msg" : "Ya tienes una postulacion pendiente a esta oferta" }';
 				return $RP;
 			}	
@@ -189,7 +225,7 @@ class PostulacionController extends AppBaseController
 						'oferta_id' => intval($id_),
 						'candidato_id' => intval($emp_),
 			       ]);
-			if(!empty($obj)  ){
+			if($obj){
 				$RP = '{"registro":true,"msg" : "Postulado exitosamente!" }';
 				return $RP;
 			}else{
