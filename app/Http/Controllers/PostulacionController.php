@@ -65,7 +65,8 @@ class PostulacionController extends AppBaseController
 		$hora_=  date("H:i:s", time());
 		$validar=$fecha_.$hora_;
 		$lista="";
-		$lista = DB::select( DB::raw("SELECT DISTINCT U.id,E.contacto as name,E.empresa,E.created_at as ago,P.estatus_id,U.url_imagen as face 
+		$lista = DB::select( DB::raw("SELECT DISTINCT U.id,E.contacto as name,E.empresa,E.telefono,
+		        E.created_at as ago,P.estatus_id,U.url_imagen as face 
 		        FROM ofertas O,postulaciones P,empleadores E,users U 
 		        WHERE P.candidato_id='". $prop_  ."' and P.estatus_id in ('1','2') and P.oferta_id=O.id 
 				   and O.empleador_id=E.id and E.user_id=U.id ") );
@@ -87,7 +88,8 @@ class PostulacionController extends AppBaseController
 		$hora_=  date("H:i:s", time());
 		$validar=$fecha_.$hora_;
 		$lista="";
-		$lista = DB::select( DB::raw("SELECT DISTINCT U.id,E.nombres as name,E.apellidos as empresa,E.created_at as ago,U.url_imagen as face 
+		$lista = DB::select( DB::raw("SELECT DISTINCT U.id,E.nombres as name,E.apellidos as empresa,E.telefono,
+		        E.created_at as ago,U.url_imagen as face 
 				FROM ofertas O,postulaciones P,candidatos E,users U 
 		        WHERE P.estatus_id in ('1','2') and P.oferta_id=O.id and O.empleador_id='". $prop_  ."'
 				   and P.candidato_id=E.id and E.user_id=U.id ") );

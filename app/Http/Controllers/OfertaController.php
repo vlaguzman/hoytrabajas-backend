@@ -147,12 +147,15 @@ class OfertaController extends AppBaseController
 						'direccion' => $direccion_,
 						'lat' => $lat_,
 						'lng' => $lng_,
-						'url_imagen' => $url_imagen_,
+						'url_imagen' => asset('/images/system_imgs/ofertadef.png'),
 						'sector_id' => intval($sector_),
 						'ciudad_id' => intval($ciudad_id_),
 						'empleador_id' => intval($emp_),
 			    ]);
 			if($obj){
+			    $id_=$obj->id;
+				$obj->url_imagen=$this->guardar_imagen($id_,$url_imagen_);
+				$obj->save();
 				$RP = '{"registro":true,"msg" : "Oferta registrada exitosamente!" }';
 				return $RP;
 			}else{
@@ -161,8 +164,33 @@ class OfertaController extends AppBaseController
 			}
 		}	
 	 }	
+	
 		
-		
+	private function guardar_imagen($id,$url){
+		$file=asset('/images/system_imgs/ofertadef.png');
+		$arrContextOptions=array(
+			"ssl"=>array(
+				"verify_peer"=>false,
+				"verify_peer_name"=>false,
+			),
+	    );
+		$img ="";
+		$img_local="";
+		if($url!=""){
+			$img = @file_get_contents($url, false, stream_context_create($arrContextOptions));
+			 if($img==false){
+				 return $file;
+			  }
+		}
+		if($img!=""){
+			$img_local='/images/system_imgs/ofertas/ioferta_' . $id .'.jpg';
+			$file =public_path().$img_local;
+			file_put_contents($file, $img);
+			$file =asset($img_local);
+		}
+		return $file;
+	}
+	
     /**
      * Display a listing of the Oferta.
      *

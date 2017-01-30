@@ -18,7 +18,7 @@ class VerifyCsrfToken extends BaseVerifier
 		'getdetoferta*','buscarcandidato*','getcandidatoa*','verificarmembresia*','postulacionempleadores*',
 		'getcandidatodetalle*','getdetusuario*','historicomensajes*','regmensaje*','postulacionusuarios*',
 		'postulacionpendientes*','postulacionaceptadas*','postulacionrechazadas*','loginrs*','registrarurs*',
-		'getempresadetalle*','verificarpostulacion*'
+		'getempresadetalle*','verificarpostulacion*','actualizaru2*'
 		
     ];
 }

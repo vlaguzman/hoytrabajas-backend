@@ -47,6 +47,7 @@ Route::get('/home', 'HomeController@index');
 	Route::any('getcandidatodetalle', 'CandidatoController@getcandidatodetalle');
 	Route::any('getempresa', 'EmpleadorController@getempleador');
 	Route::any('getempresadetalle', 'EmpleadorController@getdetalle');
+	Route::any('actualizaru2', 'EmpleadorController@actualizar');
 	/* fin gets*/
 	Route::any('loginm', 'UsuarioController@login');
 	Route::any('loginrs', 'UsuarioController@login_byemail');

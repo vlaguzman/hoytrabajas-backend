@@ -13,6 +13,7 @@ use Flash;
 use App\Http\Controllers\AppBaseController;
 use Response;
 use App\Models\Candidato;
+use App\User;
 
 class CandidatoController extends AppBaseController
 {
@@ -64,10 +65,17 @@ class CandidatoController extends AppBaseController
 				$idioma_ = $requestx->idioma;
 			}
 		}
-		$lista= Candidato::where([ ['nombres', 'like',$nom_  ] ] )
-		       ->where($parametros)
-		       ->orderBy('rate', 'desc')->get();
-		
+		$lista  = Candidato::select('candidatos.id','candidatos.nombres','candidatos.apellidos','candidatos.telefono',
+		     'candidatos.correo','candidatos.descripcion','candidatos.direccion','candidatos.experiencia',
+			 'candidatos.rate','candidatos.fnac',
+			 'users.id as iduser','users.url_imagen','users.email as usuario',
+			 'ciudades.descripcion as des_ciudad','generos.descripcion as des_genero')
+			->where([ ['nombres', 'like',$nom_  ] ] ) 
+			->where($parametros)
+            ->join('users','candidatos.user_id','=','users.id')
+            ->join('ciudades','candidatos.ciudad_id','=','ciudades.id')
+			->join('generos','candidatos.genero_id','=','generos.id')
+		    ->orderBy('rate', 'desc')->get();
 		if($lista){
 			return Response::json(
 		       [ 'lista' =>  $lista , 'encontro' =>  true ]

@@ -29,8 +29,7 @@ class CiudadController extends AppBaseController
 					$id_ = $requestx->id;
 				}
 			}	
-		  $lista= Ciudad::where([ ['departamento_id', '=',$id_ ] ] )
-		    ->orderBy('descripcion', 'desc')->get(['id', 'descripcion']);
+		$lista= Ciudad::where([ ['departamento_id', '>',0] ] )->orderBy('descripcion', 'desc')->get(['id', 'descripcion']);
 		return Response::json($lista);
      }
     /**
